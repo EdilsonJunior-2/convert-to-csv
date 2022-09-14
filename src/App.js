@@ -5,13 +5,16 @@ import { CSVLink } from "react-csv";
 
 function App() {
   const [file, setFile] = useState();
+  const [fileName, setFileName] = useState();
   const [initialData, setInitialData] = useState(null);
   const [currentSheet, setCurrentSheet] = useState([]);
 
   const handleUpload = (event) => {
-    const file = event.target.files[0];
+    const newFile = event.target.files[0];
     //read excel file
-    readFile(file)
+    console.log(newFile);
+    setFileName(newFile.name);
+    readFile(newFile)
       .then((readedData) => setInitialData(readedData))
 
       .catch((error) => console.error(error));
@@ -30,20 +33,33 @@ function App() {
   }, [file]);
 
   return (
-    <div className="App">
-      <input type="file" accept=".xlsx" onChange={handleUpload} />
-      <ReactExcel
-        initialData={initialData}
-        onSheetUpdate={(currentSheet) => setCurrentSheet(currentSheet)}
-        activeSheetClassName="active-sheet"
-        reactExcelClassName="react-excel"
+    <div className="container">
+      <label for="file-input">Carregar arquivo .xlsx</label>
+      <input
+        id="file-input"
+        type="file"
+        accept=".xlsx"
+        onChange={handleUpload}
       />
+      {fileName && (
+        <>
+          <span>Nome do arquivo: {fileName}</span>
+          <ReactExcel
+            initialData={initialData}
+            onSheetUpdate={(currentSheet) => setCurrentSheet(currentSheet)}
+            activeSheetClassName="active-sheet"
+            reactExcelClassName="react-excel"
+          />
 
-      <button onClick={save}>Download</button>
-      {file && (
-        <CSVLink style={{ display: "hidden" }} data={file} id="csv-button">
-          Download
-        </CSVLink>
+          <button onClick={save}>Download</button>
+          {file && (
+            <div className="csv-button">
+              <CSVLink data={file} id="csv-button">
+                Download
+              </CSVLink>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
